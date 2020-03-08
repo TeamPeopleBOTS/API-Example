@@ -1,9 +1,9 @@
 # Eater API
 Eater Whatsapp API Documentation
 
-* **URL**           
+* **URL**                               **Method:**          **URL Params**
 
-  https://api.eaterwa.us
+  https://api.eaterwa.us                `GET`                `/`
   
 * **Method:**
 
