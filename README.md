@@ -4,8 +4,8 @@ Eater Whatsapp API Documentation
 **HOST** `http://api.blablabla.us`
 
 ### Example API Entry
- **Title**	**Create Client**
- **URL**	`/client`
+> **Title**	**Create Client**
+> **URL**	`/client`
  **Method**	**GET**
  **URL Parameters**	**Required:**
  `None`
