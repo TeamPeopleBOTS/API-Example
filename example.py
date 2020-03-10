@@ -205,3 +205,49 @@ def getGroupAdmins(to):
 	}
 	req = requests.post(url, data=data, headers=headers)
 	return req.json()
+
+def mentionAll(message):
+
+    if message['chatType'] == 'group':
+        result = '╭───「 Mention Members 」\n'
+        no = 0
+        members = getGroupParticipantsIds(message['chat_id'])['result']
+        if myId in members:
+            members.remove(myId)
+        for member in members:
+            no += 1
+            result += '│ %i. @%s\n' % (no, member.replace('@c.us',''))
+        result += '╰───「 Hello World 」\n'
+        sendMention(to, result, members)
+    else:
+        sendMessage(to, 'Group only!')
+	
+def check_m():
+	while True:
+		req = requests.get(host + '/messages/unread', headers=headers)
+		if req.json() == []:
+			pass
+		else:
+			for contact in req.json():
+				for message in contact['messages']:
+					
+					try:
+						cont = str(message['content'][0:25])
+					except:
+						cont = 'None'
+
+					print('new message - {} from {} message {}...'.format(str(message['type']), str(message['sender']['formattedName']), cont))
+					try:
+						sender_id = message['sender']['id']
+					except:
+						sender_id = "None"
+					try:
+						chat_id = message['chat_id']
+					except:
+						chat_id = sender_id
+					if message['type'] == 'chat':
+						text = message['content']
+						txt  = text.lower()
+						cmd  = text.lower()
+						to   = chat_id
+						sender = sender_id
