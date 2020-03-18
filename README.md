@@ -5,9 +5,9 @@ Eater Whatsapp API Documentation
 
 
 **AUTHOR**
-* Ryns [Ryns](https://github.com/rynkings)
-* Zero Cool [Zero Cool](https://github.com/crash-override404)
-* Hery Winarto [Hery Winarto](https://wa.boteater.us)
+* [Ryns](https://github.com/rynkings)
+* [Zero Cool](https://github.com/crash-override404)
+* Hery Winarto
 
 **SUPPORT**
 * Hello World
