@@ -7,8 +7,8 @@ to = '6287859909669-1576979420@g.us' #groupid
 #to = '6287859909669@c.us' #chatid
 
 headers = {
-	'auth-key': 'YOUR APIKEY',
-	'client_id': 'YOUR CLIENT ID',
+	'apikey': 'YOUR APIKEY',
+	'userid': 'YOUR USER ID',
 	'username': 'YOUR USERNAME'
 }
 
