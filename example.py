@@ -1,7 +1,7 @@
 import requests
 import json
 
-host = 'http://127.0.0.1:5000'
+host = 'https://wa.boteater.us/api'
 
 to = '6287859909669-1576979420@g.us' #groupid
 #to = '6287859909669@c.us' #chatid
@@ -12,11 +12,15 @@ headers = {
 	'username': 'YOUR USERNAME'
 }
 
+def getClient():
+    url = host + '/client'
+    a = requests.get(url, headers=headers)
+    return a
+
 def getQr():
-	url = host + '/screen'
-	a = requests.get(host + '/screen', headers=headers)
-	result = host + '/' + a.json()['result']
-	return result
+    url = host + '/login'
+    a = requests.get(url, headers=headers)
+    return a.json()
 
 def sendMessage(to, text):
 	url = host + '/sendMessage'
@@ -63,12 +67,12 @@ def setBio(bio):
 	req = requests.post(url, data=data, headers=headers)
 	return req.json()
 
-def getBio(user_id):
+def getBio(chat_id):
 	url = host + '/getBio'
-	params = {
-		'user_id': user_id
+	data = {
+		'chat_id': chat_id
 	}
-	req = requests.get(url, params=params, headers=headers)
+	req = requests.get(url, data=data, headers=headers)
 	return req.json()
 
 def getContacts():
@@ -103,9 +107,12 @@ def getChats():
 	return req.json()
 
 def getChat(to):
-	url = host + '/getChats/' + to
-	req = requests.get(url, headers=headers)
-	return req.json()
+    url = host + '/getChatsinchat'
+    data = {
+        'chat_id': to
+    }
+    req = requests.post(url, data=data, headers=headers)
+    return req.json()
 
 def sendSeen(to):
 	url = host + '/sendSeen'
@@ -125,7 +132,7 @@ def sendReply(message_id, text):
 	return req.json()
 
 def downloadObjMessage(message_id):
-	url = host + '/message/' + message_id + '/download'
+	url = host + '/messages/' + message_id + '/download'
 	req = requests.get(url, headers=headers)
 	return req.json()
 
@@ -166,13 +173,15 @@ def deleteChat(to):
 	req = requests.post(url, data=data, headers=headers)
 	return req.json()
 
-def unsendMessage(to):
-	url = host + '/unsendMessage'
-	data = {
-		'chat_id': to
-	}
-	req = requests.post(url, data=data, headers=headers)
-	return req.json()
+def unsendMessage(to, message_ids=[], _all=True):
+    url = host + '/unsendMessage'
+    data = {
+        'chat_id': to,
+        'message_ids': message_ids,
+        'all': _all
+    }
+    req = requests.post(url, data=data, headers=headers)
+    return req.json()
 
 def getGroupParticipantsIds(to):
 	url = host + '/getGroupParticipantsIds'
@@ -223,31 +232,46 @@ def mentionAll(message):
         sendMessage(to, 'Group only!')
 	
 def check_m():
-	while True:
-		req = requests.get(host + '/messages/unread', headers=headers)
-		if req.json() == []:
-			pass
-		else:
-			for contact in req.json():
-				for message in contact['messages']:
-					
-					try:
-						cont = str(message['content'][0:25])
-					except:
-						cont = 'None'
+    print(getClient().text)
+    qr = getQr()
+    if 'LoggedIn' in str(qr):
+        while True:
+            req = requests.post(host + '/unread', headers=headers)
+            if req.json()['result'] == []:
+                pass
+            else:
+                try:
+                    print(req.json()['error'])
+                except:
+                    pass
+                for contact in req.json()['result']:
+                    for message in contact['messages']:
+                        
+                        try:
+                            cont = str(message['content'][0:25])
+                        except:
+                            cont = 'None'
 
-					print('new message - {} from {} message {}...'.format(str(message['type']), str(message['sender']['formattedName']), cont))
-					try:
-						sender_id = message['sender']['id']
-					except:
-						sender_id = "None"
-					try:
-						chat_id = message['chat_id']
-					except:
-						chat_id = sender_id
-					if message['type'] == 'chat':
-						text = message['content']
-						txt  = text.lower()
-						cmd  = text.lower()
-						to   = chat_id
-						sender = sender_id
+                        print('new message - {} from {} message {}...'.format(str(message['type']), str(message['sender']['formattedName']), cont))
+                        try:
+                            sender_id = message['sender']['id']
+                        except:
+                            sender_id = "None"
+                        try:
+                            chat_id = message['chat_id']
+                        except:
+                            chat_id = sender_id
+                        if message['type'] == 'chat':
+                            text = message['content']
+                            txt  = text.lower()
+                            cmd  = text.lower()
+                            to   = chat_id
+                            sender = sender_id
+                            msg_id = message['id']
+
+                            if txt == 'tag':
+                                mentionAll(message)
+                            elif txt == 'status':
+                                sendReply(msg_id, 'Alive Gan')
+    else:
+	print(qr)
