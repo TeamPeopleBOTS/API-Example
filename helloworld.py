@@ -12,9 +12,9 @@ to = '6287859909669-1576979420@g.us'
 myId = '6287859909669@c.us'
 
 headers = {
-    'apikey': 'WApikey-Kbl9bHg9fKfNtSBA5502hcmNI',
-    'userid': 'WAclient-aB9zKuZoXYVv5VS',
-    'username': 'Ryns'
+    'apikey': 'Your-APIKEY',
+    'userid': 'Your-userid',
+    'username': 'Your-username'
 }
 
 settings = {
