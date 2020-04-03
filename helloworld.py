@@ -5,14 +5,14 @@ import shutil
 
 host = 'https://wa.boteater.us/api'
 
-to = '6287859909669@c.us'
+to = '6287859909669-1576979420@g.us'
 
 myId = '6287859909669@c.us'
 
 headers = {
-    'apikey': 'Your-APIKEY',
-    'userid': 'Your-userid',
-    'username': 'Your-username'
+    'apikey': 'YOUR APIKEY',
+    'userid': 'YOUR USER ID',
+    'username': 'YOUR USERNAME'
 }
 
 settings = {
@@ -121,10 +121,14 @@ print(getClient().text)
 
 qr = getQr()
 
-if 'url' in str(qr['result']):
-    print('Please scan this QR\n\nQR: ' + str(qr['result']['url']))
+try:
+    print('Scan this QR : ', qr['result']['qr-callback'])
+except:
+    print('Trying to login')
 
 callback = requests.get(qr['result']['callback'], headers=headers)
+
+print(callback.text)
 
 def check_m(include_me=True, include_notifications=True):
     
@@ -160,6 +164,13 @@ def check_m(include_me=True, include_notifications=True):
 
                         if settings['autoRead']:
                             sendSeen(to)
+                            
+                        if message['subtype'] == 'invite' or message['subtype'] == 'add':
+                            if myId in message['recipients']:
+                                sendMention(to, 'Hello @{} Thanks for invited me'.format(message['author'].replace('@c.us','')), [message['author']])
+                            else:
+                                for recipient in message['recipients']:
+                                    sendMention(to, 'Halo @{} Selamat datang di {}'.format(recipient.replace('@c.us',''),message['chat']['contact']['name']), [recipient])
 
                         if message['type'] == 'chat':
                             text = message['content']
@@ -170,6 +181,7 @@ def check_m(include_me=True, include_notifications=True):
                             msg_id = message['id']
 
                             if txt == 'tag':
+                              if sender == myId:
                                 mentionAll(message)
                             elif txt == 'status':
                                 sendReply(msg_id, 'Alive Gan')
@@ -181,6 +193,54 @@ def check_m(include_me=True, include_notifications=True):
                                 sendMention(to, '@' + nomer, [sender])
                             elif txt == 'author pict':
                                 sendMediaWithURL(to, 'https://i.ibb.co/dBsw1Xf/photo-2019-10-28-18-07-44.jpg', 'pict.jpg')
+                            elif txt.startswith("topik_alquran: "):
+                                sep = text.split(" ")
+                                textnya = text.replace(sep[0] + " ","")
+                                result = requests.get("https://api.haipbis.xyz/searchqurdis?q={}".format(textnya))
+                                data = result.json()
+                                ret_ = "╭──[ TOPIK AL-QUR'AN & HADITS ]"
+                                ret_ += "\n├⌬ Ayat Qur'an : "+str(data[0]['quran/hadis'])
+                                ret_ += "\n├⌬ Sumber : "+str(data[0]['link'])
+                                ret_ += "\n├⌬ Isi Al-Qur'an: "
+                                ret_ += "\n├⌬     Bahasa Arab : "+str(data[0]['teks']['arab'])
+                                ret_ += "\n├⌬     Bahasa Latin : "+str(data[0]['teks']['latin'])
+                                ret_ += "\n╰───────[ Bismillah ]"
+                                sendMessage(to, str(ret_))
+                            elif txt.startswith("musik:"):
+                                proses = text.split(" ")
+                                urutan = text.replace(proses[0] + " ","")
+                                r = requests.get("https://api.fckveza.com/mp3={}".format(urutan))
+                                data = r.text
+                                data = json.loads(data)
+                                ret_ = "╭──[ Musik MP3 ]"
+                                ret_ += "\n├⋄ Title : {}".format(str(data["judul"]))
+                                ret_ += "\n├⋄ Album : {}".format(str(data["album"]))
+                                ret_ += "\n├⋄ Penyanyi : {}".format(str(data["penyanyi"]))
+                                ret_ += "\n╰──[ Finish ]"
+                                sendMediaWithURL(to, str(data["linkImg"]), 'pict.jpg', caption=ret_)
+                                sendMediaWithURL(to, str(data["linkMp3"]), 'music.mp3')                                
+                            elif txt == 'corona':
+                                r=requests.get("https://api.kawalcorona.com/indonesia")
+                                data=r.text
+                                data=json.loads(data)
+                                ret_ = "「 COVID-19」"
+                                ret_ += "\nCountry : *{}*".format(str(data[0]["name"]))
+                                ret_ += "\nVictims : *{}*".format(str(data[0]["positif"]))
+                                ret_ += "\nRecover : *{}*".format(str(data[0]["sembuh"]))
+                                ret_ += "\nDeath : *{}*".format(str(data[0]["meninggal"]))
+                                sendMessage(to, ret_)
+                            elif txt.startswith('corona '):
+                                textt = text.replace(text.split(' ')[0] + ' ', '')
+                                r=requests.get("https://api.kawalcorona.com/indonesia/provinsi").json()
+                                for atr in r:
+                                    data = atr['attributes']
+                                    if data['Provinsi'].lower() == textt:
+                                        res = '「 COVID-19」'
+                                        res += '\nProvinsi   : *{}*'.format(data['Provinsi'])
+                                        res += '\nVictims    : *{}*'.format(data['Kasus_Posi'])
+                                        res += '\nRecover    : *{}*'.format(data['Kasus_Semb'])
+                                        res += '\nKasus_Meni : *{}*'.format(data['Kasus_Meni'])
+                                        sendMessage(to, res)
                             elif txt == 'autoread on':
                                 if settings['autoRead']:
                                     sendMessage(to, 'auto read telah di aktifkan')
